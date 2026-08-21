@@ -37,12 +37,12 @@ class AudioEngine {
     this.beatImpact = 0; // 0.0 to 1.0 flash/shockwave power
     this.isBeat = false;
     this.lastBeatTime = 0;
-    this.bpm = 120;
+    this.bpm = 144;
 
     // Track Metadata
     this.currentTrack = {
-      title: 'Cyber Skyline (Demo Track)',
-      artist: 'Toronto Synthwave Engine',
+      title: 'Toronto Cyber Metal (Gemini Demo)',
+      artist: 'Gemini Heavy Metal Synthesizer',
       isDemo: true,
       isMic: false
     };
@@ -105,7 +105,7 @@ class AudioEngine {
       window.dispatchEvent(new CustomEvent('audio-time-update', {
         detail: {
           currentTime: this.audioElement.currentTime,
-          duration: this.audioElement.duration || 32
+          duration: this.audioElement.duration || 30
         }
       }));
     });
@@ -119,8 +119,8 @@ class AudioEngine {
     this.stopMic();
 
     this.currentTrack = {
-      title: 'Cyber Skyline (Demo Track)',
-      artist: 'Toronto Synthwave Engine',
+      title: 'Toronto Cyber Metal (Gemini Demo)',
+      artist: 'Gemini Heavy Metal Synthesizer',
       isDemo: true,
       isMic: false
     };
