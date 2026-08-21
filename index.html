@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toronto Skyline 16:9 Reflection Box Equalizer</title>
+  <meta name="description" content="Audio-reactive Toronto skyline visualizer. Slices the reflection into boxes that light up to music frequencies.">
+  
+  <!-- Modern Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome / Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Background Glow & Ambient Elements -->
+  <div class="app-background">
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+    <div class="grid-overlay"></div>
+  </div>
+
+  <!-- Top App Navigation Header -->
+  <header class="app-header">
+    <div class="header-left">
+      <div class="brand-badge">
+        <span class="pulse-dot"></span>
+        <span class="brand-tag">16:9 REFLECTION MATRIX</span>
+      </div>
+      <div class="brand-title-wrap">
+        <h1 class="brand-title">TORONTO <span class="accent-text">SKYLINE</span></h1>
+        <span class="brand-sub">Boxed Reflection Equalizer</span>
+      </div>
+    </div>
+
+    <!-- Center Mode Badges / Quick Preset Bar -->
+    <div class="header-center">
+      <div class="preset-pill-group" id="quick-mode-selector">
+        <button class="preset-pill active" data-mode="reflection_eq" title="Equalizer Columns">
+          <i class="fa-solid fa-chart-column"></i> Reflection EQ
+        </button>
+        <button class="preset-pill" data-mode="wave_cascade" title="Wave Cascade">
+          <i class="fa-solid fa-water"></i> Wave Cascade
+        </button>
+        <button class="preset-pill" data-mode="beat_pulse" title="Beat Flash Matrix">
+          <i class="fa-solid fa-border-all"></i> Beat Matrix
+        </button>
+        <button class="preset-pill" data-mode="radial_spire" title="CN Tower Radial Spire">
+          <i class="fa-solid fa-tower-broadcast"></i> Radial Spire
+        </button>
+      </div>
+    </div>
+
+    <!-- Header Action Controls -->
+    <div class="header-right">
+      <button class="btn btn-glass" id="btn-load-demo" title="Play Bundled Demo Track">
+        <i class="fa-solid fa-bolt text-gold"></i>
+        <span>Play Demo</span>
+      </button>
+
+      <label class="btn btn-primary file-upload-btn" id="upload-label" for="audio-file-input" title="Upload your own music file (.mp3, .wav, .ogg, .flac)">
+        <i class="fa-solid fa-cloud-arrow-up"></i>
+        <span>Upload Music</span>
+        <input type="file" id="audio-file-input" accept="audio/*" class="sr-only">
+      </label>
+
+      <button class="btn btn-icon" id="btn-mic-toggle" title="Listen to Microphone / Live Audio">
+        <i class="fa-solid fa-microphone"></i>
+      </button>
+
+      <button class="btn btn-icon" id="btn-settings-toggle" title="Visualizer Settings & Customization">
+        <i class="fa-solid fa-sliders"></i>
+      </button>
+
+      <button class="btn btn-icon" id="btn-fullscreen-toggle" title="Toggle 16:9 Fullscreen">
+        <i class="fa-solid fa-expand"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Viewport Section with Fixed 16:9 Ratio Container -->
+  <main class="main-content">
+    <div class="visualizer-stage" id="visualizer-stage">
+      <div class="aspect-16-9-wrapper" id="viewport-wrapper">
+        <!-- 16:9 Canvas -->
+        <canvas id="visualizer-canvas" width="1920" height="1080"></canvas>
+
+        <!-- Dropzone Overlay -->
+        <div class="drag-drop-overlay" id="drag-drop-zone">
+          <div class="drop-content">
+            <i class="fa-solid fa-music drop-icon"></i>
+            <h3>Drop Audio File Here</h3>
+            <p>Supports MP3, WAV, OGG, FLAC, M4A, AAC</p>
+          </div>
+        </div>
+
+        <!-- Idle Overlay / Click to Start Prompt -->
+        <div class="idle-overlay" id="idle-overlay">
+          <div class="idle-card glass-panel">
+            <div class="idle-icon-wrap">
+              <i class="fa-solid fa-water idle-icon"></i>
+            </div>
+            <h2>Toronto Reflection Equalizer</h2>
+            <p>Play the demo track or upload your music to illuminate the dark water reflection in dynamic boxes.</p>
+            <div class="idle-actions">
+              <button class="btn btn-glow" id="btn-hero-demo">
+                <i class="fa-solid fa-play"></i> Play Demo Track
+              </button>
+              <button class="btn btn-glass" id="btn-hero-upload">
+                <i class="fa-solid fa-upload"></i> Upload File
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Viewport Overlays (HUD) -->
+        <div class="viewport-hud top-left-hud">
+          <div class="hud-card glass-panel">
+            <div class="track-badge">
+              <i class="fa-solid fa-compact-disc spin-icon" id="track-spin-icon"></i>
+              <span id="hud-track-name">Cyber Skyline (Demo Track)</span>
+            </div>
+            <div class="live-bands-meter">
+              <div class="band-col"><span class="band-bar" id="meter-sub"></span><label>SUB</label></div>
+              <div class="band-col"><span class="band-bar" id="meter-bass"></span><label>BASS</label></div>
+              <div class="band-col"><span class="band-bar" id="meter-mid"></span><label>MID</label></div>
+              <div class="band-col"><span class="band-bar" id="meter-high"></span><label>HIGH</label></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="viewport-hud top-right-hud">
+          <div class="hud-card glass-panel stats-card">
+            <div class="stat-item">
+              <span class="stat-label">GRID</span>
+              <span class="stat-val" id="stat-grid-size">48 × 20</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <span class="stat-label">BPM</span>
+              <span class="stat-val" id="stat-bpm">120</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <span class="stat-label">FPS</span>
+              <span class="stat-val text-green" id="stat-fps">60</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Bottom Floating Audio Player Bar -->
+  <footer class="player-bar-container">
+    <div class="player-bar glass-panel">
+      <!-- Player Left: Track Details -->
+      <div class="player-left">
+        <div class="album-thumb" id="player-thumb">
+          <i class="fa-solid fa-water"></i>
+        </div>
+        <div class="track-info">
+          <div class="track-title" id="player-track-title">Cyber Skyline (Original Mix)</div>
+          <div class="track-artist" id="player-track-artist">Toronto Synthwave Engine</div>
+        </div>
+      </div>
+
+      <!-- Player Center: Playback Controls & Progress Bar -->
+      <div class="player-center">
+        <div class="control-buttons">
+          <button class="ctrl-btn" id="btn-backward-10" title="Rewind 10s">
+            <i class="fa-solid fa-rotate-left"></i>
+          </button>
+          <button class="ctrl-btn play-btn" id="btn-play-pause" title="Play / Pause (Space)">
+            <i class="fa-solid fa-play" id="play-pause-icon"></i>
+          </button>
+          <button class="ctrl-btn" id="btn-forward-10" title="Forward 10s">
+            <i class="fa-solid fa-rotate-right"></i>
+          </button>
+          <button class="ctrl-btn" id="btn-loop-toggle" title="Loop Track">
+            <i class="fa-solid fa-repeat"></i>
+          </button>
+        </div>
+
+        <div class="progress-container">
+          <span class="time-readout" id="current-time-display">0:00</span>
+          <div class="progress-bar-track" id="seek-bar-track">
+            <div class="progress-bar-fill" id="seek-bar-fill"></div>
+            <div class="progress-bar-thumb" id="seek-bar-thumb"></div>
+          </div>
+          <span class="time-readout" id="total-time-display">0:32</span>
+        </div>
+      </div>
+
+      <!-- Player Right: Volume & Quick Controls -->
+      <div class="player-right">
+        <div class="volume-control-wrap">
+          <button class="ctrl-btn icon-only" id="btn-mute" title="Mute / Unmute (M)">
+            <i class="fa-solid fa-volume-high" id="volume-icon"></i>
+          </button>
+          <input type="range" min="0" max="1" step="0.01" value="0.85" class="custom-slider volume-slider" id="volume-slider">
+        </div>
+        <button class="ctrl-btn icon-only" id="btn-drawer-open" title="Open Customization Settings">
+          <i class="fa-solid fa-sliders"></i>
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Customization & Settings Slide-Over Drawer -->
+  <aside class="settings-drawer glass-panel" id="settings-drawer">
+    <div class="drawer-header">
+      <div class="drawer-title">
+        <i class="fa-solid fa-sliders text-accent"></i>
+        <h3>Reflection Matrix Customizer</h3>
+      </div>
+      <button class="btn-close" id="btn-drawer-close" title="Close Settings">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="drawer-content">
+      <!-- Section: Visualizer Modes -->
+      <div class="drawer-section">
+        <label class="section-title">Reflection Equalizer Mode</label>
+        <div class="option-grid">
+          <button class="mode-card active" data-mode="reflection_eq">
+            <i class="fa-solid fa-chart-column"></i>
+            <span>Reflection EQ</span>
+          </button>
+          <button class="mode-card" data-mode="wave_cascade">
+            <i class="fa-solid fa-water"></i>
+            <span>Wave Cascade</span>
+          </button>
+          <button class="mode-card" data-mode="beat_pulse">
+            <i class="fa-solid fa-border-all"></i>
+            <span>Beat Matrix</span>
+          </button>
+          <button class="mode-card" data-mode="radial_spire">
+            <i class="fa-solid fa-tower-broadcast"></i>
+            <span>Radial Spire</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Section: Grid Matrix Resolution -->
+      <div class="drawer-section">
+        <div class="slider-header">
+          <label class="section-title">Reflection Columns (Box Width)</label>
+          <span class="slider-value" id="val-grid-cols">48 cols (48 × 20)</span>
+        </div>
+        <input type="range" min="24" max="96" step="6" value="48" class="custom-slider" id="slider-grid-cols">
+
+        <div class="slider-header mt-3">
+          <label class="section-title">Reflection Rows (Box Height)</label>
+          <span class="slider-value" id="val-grid-rows">20 rows</span>
+        </div>
+        <input type="range" min="8" max="36" step="2" value="20" class="custom-slider" id="slider-grid-rows">
+      </div>
+
+      <!-- Section: Box Border Spacing -->
+      <div class="drawer-section">
+        <div class="slider-header">
+          <label class="section-title">Box Grid Gap</label>
+          <span class="slider-value" id="val-box-gap">1.5 px</span>
+        </div>
+        <input type="range" min="0" max="4" step="0.5" value="1.5" class="custom-slider" id="slider-box-gap">
+      </div>
+
+      <!-- Section: Audio Reactivity Sliders -->
+      <div class="drawer-section">
+        <div class="slider-header">
+          <label class="section-title">Audio Sensitivity (Gain)</label>
+          <span class="slider-value" id="val-sensitivity">1.3x</span>
+        </div>
+        <input type="range" min="0.4" max="2.5" step="0.1" value="1.3" class="custom-slider" id="slider-sensitivity">
+
+        <div class="slider-header mt-3">
+          <label class="section-title">Equalizer Decay Speed</label>
+          <span class="slider-value" id="val-decay">Smooth</span>
+        </div>
+        <input type="range" min="0.5" max="0.95" step="0.05" value="0.82" class="custom-slider" id="slider-decay">
+
+        <div class="slider-header mt-3">
+          <label class="section-title">Shoreline Horizon Position</label>
+          <span class="slider-value" id="val-horizon">58%</span>
+        </div>
+        <input type="range" min="50" max="66" step="1" value="58" class="custom-slider" id="slider-horizon">
+      </div>
+
+      <!-- Section: Options -->
+      <div class="drawer-section">
+        <label class="section-title">Options</label>
+        <div class="toggle-list">
+          <label class="toggle-item">
+            <span><i class="fa-solid fa-border-top-left text-cyan"></i> Box Glass Outline</span>
+            <input type="checkbox" id="toggle-box-border" checked class="custom-toggle">
+          </label>
+          <label class="toggle-item">
+            <span><i class="fa-solid fa-eye-slash text-gold"></i> Faint Rest State Outline (0.05)</span>
+            <input type="checkbox" id="toggle-rest-state" class="custom-toggle">
+          </label>
+        </div>
+      </div>
+
+      <!-- Reset Button -->
+      <div class="drawer-section">
+        <button class="btn btn-glass w-100" id="btn-reset-defaults">
+          <i class="fa-solid fa-arrow-rotate-left"></i> Reset to Defaults
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Audio Element for Streaming and Playback -->
+  <audio id="audio-player" preload="auto" crossorigin="anonymous"></audio>
+
+  <!-- Application Scripts -->
+  <script src="js/audio.js"></script>
+  <script src="js/visualizer.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
